@@ -1,0 +1,42 @@
+services:
+  api:
+    build: .
+    container_name: storycraft_api
+    env_file: .env
+    volumes:
+      - ./app:/app/app
+      - ./data:/app/data
+      - ./data/videos:/app/data/videos
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command: >
+      sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  db:
+    image: postgres:16-alpine
+    container_name: storycraft_db
+    environment:
+      POSTGRES_DB: storycraft
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4:8.12
+    container_name: storycraft_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
+
